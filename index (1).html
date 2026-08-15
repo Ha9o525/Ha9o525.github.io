@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>برنامج التغذية والتمرين</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800;900&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#15120f;
+    --surface:#201b17;
+    --surface-2:#2a231d;
+    --line:#3a322a;
+    --accent:#ff4e32;
+    --accent-soft:rgba(255,78,50,.14);
+    --gold:#c9a15c;
+    --gold-soft:rgba(201,161,92,.14);
+    --text:#f4efe7;
+    --text-muted:#9c948a;
+    --radius:18px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{background:var(--bg); color:var(--text);}
+  body{
+    font-family:'Cairo',sans-serif;
+    min-height:100vh;
+    padding:28px 16px 80px;
+    background:
+      radial-gradient(1200px 500px at 85% -10%, rgba(255,78,50,.10), transparent 60%),
+      radial-gradient(900px 400px at 10% 0%, rgba(201,161,92,.08), transparent 55%),
+      var(--bg);
+  }
+  .wrap{max-width:920px; margin:0 auto;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;} }
+
+  /* ---------- HERO ---------- */
+  .hero{ text-align:center; padding:18px 8px 8px; }
+  .eyebrow{
+    font-family:'Tajawal',sans-serif; font-weight:700; font-size:13px;
+    letter-spacing:.12em; color:var(--gold); text-transform:uppercase;
+  }
+  .title{
+    font-family:'Tajawal',sans-serif; font-weight:900; font-size:clamp(30px,6vw,46px);
+    margin-top:8px; line-height:1.15;
+  }
+  .subtitle{ color:var(--text-muted); margin-top:8px; font-size:15px; }
+  .date-line{ margin-top:4px; font-size:13px; color:var(--text-muted); }
+
+  /* ---------- BARBELL LOADER (signature element) ---------- */
+  .loader-card{
+    margin:26px 0 30px; background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); padding:26px 18px 20px; position:relative; overflow:hidden;
+  }
+  .loader-title{ font-family:'Tajawal',sans-serif; font-weight:800; font-size:15px; text-align:center; color:var(--text-muted); letter-spacing:.02em;}
+  .barbell{ display:flex; align-items:center; justify-content:center; margin-top:22px; direction:ltr; }
+  .plate-stack{ display:flex; gap:5px; }
+  .plate{
+    width:14px; border-radius:4px; background:var(--surface-2); border:1px solid var(--line);
+    transition:background .4s ease, box-shadow .4s ease, transform .4s ease;
+  }
+  .plate.on{ background:var(--accent); border-color:var(--accent); box-shadow:0 0 14px var(--accent-soft); transform:translateY(-2px);}
+  .p1{height:34px;} .p2{height:46px;} .p3{height:60px;}
+  .bar{ height:8px; width:64px; background:linear-gradient(90deg,var(--line),#54493c,var(--line)); border-radius:6px; margin:0 4px;}
+  .bar-center{ position:relative; height:8px; flex:0 0 90px; background:linear-gradient(90deg,var(--line),#54493c,var(--line)); border-radius:6px; display:flex; align-items:center; justify-content:center;}
+  .count{
+    position:absolute; top:-38px; font-family:'Tajawal',sans-serif; font-weight:900; font-size:26px; direction:rtl;
+    color:var(--text);
+  }
+  .count span{ color:var(--accent); }
+  .loader-caption{ text-align:center; margin-top:34px; color:var(--text-muted); font-size:13px;}
+
+  /* ---------- SECTION HEADERS ---------- */
+  .section-head{ display:flex; align-items:baseline; gap:10px; margin:34px 0 14px; }
+  .section-head .tag{
+    font-family:'Tajawal',sans-serif; font-weight:800; font-size:12px; color:var(--bg);
+    background:var(--gold); padding:3px 10px; border-radius:20px; letter-spacing:.02em;
+  }
+  .section-head.cardio .tag{ background:var(--accent); }
+  .section-head h2{ font-family:'Tajawal',sans-serif; font-weight:800; font-size:20px; }
+  .section-sub{ color:var(--text-muted); font-size:13px; margin-top:-8px; margin-bottom:14px; }
+
+  /* ---------- CARDS ---------- */
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:16px 18px; display:flex; align-items:flex-start; gap:14px; margin-bottom:12px;
+    transition:border-color .25s ease, background .25s ease;
+  }
+  .card.done{ border-color:var(--accent); background:linear-gradient(180deg, var(--accent-soft), var(--surface) 60%); }
+  .check{
+    flex:0 0 26px; width:26px; height:26px; border-radius:50%; border:2px solid var(--line);
+    background:var(--surface-2); cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:all .2s ease; margin-top:2px;
+  }
+  .check.on{ background:var(--accent); border-color:var(--accent); }
+  .check svg{ width:14px; height:14px; opacity:0; transition:opacity .15s ease; }
+  .check.on svg{ opacity:1; }
+  .card-body{ flex:1; }
+  .card-title{ font-family:'Tajawal',sans-serif; font-weight:700; font-size:15.5px; }
+  .card-title small{ color:var(--text-muted); font-weight:500; font-size:12.5px; margin-inline-start:6px;}
+  .card-detail{ color:var(--text-muted); font-size:13.5px; margin-top:5px; line-height:1.9; }
+  .pill-row{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .pill{ background:var(--surface-2); border:1px solid var(--line); border-radius:20px; padding:3px 10px; font-size:12px; color:var(--text-muted); }
+  .card.done .pill{ color:var(--text); }
+
+  /* ---------- TRAINING DAYS ---------- */
+  .day-tabs{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:16px; }
+  .day-tab{
+    background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:10px 4px;
+    text-align:center; cursor:pointer; font-family:'Tajawal',sans-serif; font-weight:700; font-size:13px;
+    color:var(--text-muted); transition:all .2s ease;
+  }
+  .day-tab .num{ display:block; font-size:11px; color:var(--gold); font-weight:800; margin-bottom:2px; letter-spacing:.04em;}
+  .day-tab.active{ background:var(--gold-soft); border-color:var(--gold); color:var(--text); }
+  .day-panel{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:22px 20px;
+    position:relative; overflow:hidden;
+  }
+  .day-panel::before{
+    content:""; position:absolute; inset-inline-end:-40px; top:-40px; width:150px; height:150px;
+    background:radial-gradient(circle, var(--gold-soft), transparent 70%);
+  }
+  .day-panel-label{ font-family:'Tajawal',sans-serif; font-weight:800; color:var(--gold); font-size:12px; letter-spacing:.1em; text-transform:uppercase;}
+  .day-panel-title{ font-family:'Tajawal',sans-serif; font-weight:900; font-size:24px; margin-top:6px; }
+  .muscle-row{ display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+  .muscle-chip{
+    background:var(--surface-2); border:1px solid var(--line); padding:8px 16px; border-radius:12px;
+    font-size:14px; font-weight:600;
+  }
+  .rest-note{ margin-top:16px; color:var(--text-muted); font-size:13.5px; line-height:1.9;}
+
+  /* ---------- FOOTER ---------- */
+  .reset-btn{
+    display:block; margin:36px auto 0; background:none; border:1px solid var(--line); color:var(--text-muted);
+    padding:9px 20px; border-radius:30px; font-family:'Cairo',sans-serif; font-size:12.5px; cursor:pointer;
+    transition:all .2s ease;
+  }
+  .reset-btn:hover{ border-color:var(--accent); color:var(--text); }
+  .foot-note{ text-align:center; color:var(--text-muted); font-size:11.5px; margin-top:10px; opacity:.7;}
+  button:focus-visible, .check:focus-visible, .day-tab:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">تتبّع يومك</div>
+    <div class="title">برنامج التغذية والتمرين</div>
+    <div class="subtitle">حديد، وقت، وانضباط — كل يوم لبنة جديدة</div>
+    <div class="date-line" id="todayLabel"></div>
+  </div>
+
+  <div class="loader-card">
+    <div class="loader-title">تحميل يومك</div>
+    <div class="barbell">
+      <div class="plate-stack">
+        <div class="plate p3" data-plate="0"></div>
+        <div class="plate p2" data-plate="1"></div>
+        <div class="plate p1" data-plate="2"></div>
+      </div>
+      <div class="bar"></div>
+      <div class="bar-center"><div class="count" id="countLabel">0<span>/6</span></div></div>
+      <div class="bar"></div>
+      <div class="plate-stack">
+        <div class="plate p1" data-plate="3"></div>
+        <div class="plate p2" data-plate="4"></div>
+        <div class="plate p3" data-plate="5"></div>
+      </div>
+    </div>
+    <div class="loader-caption" id="loaderCaption">لم تبدأ بعد — علّم أول عنصر لتحميل القضيب</div>
+  </div>
+
+  <div class="section-head cardio">
+    <span class="tag">تحضير</span>
+    <h2>الكارديو</h2>
+  </div>
+  <div class="card" data-key="cardio">
+    <div class="check" data-key="cardio">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="#15120f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="card-body">
+      <div class="card-title">30 دقيقة كارديو</div>
+      <div class="card-detail">وتيرة ثابتة — تُنجز حسب توقيتك المعتاد.</div>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <span class="tag">تغذية</span>
+    <h2>الوجبات اليومية</h2>
+  </div>
+
+  <div class="card" data-key="meal1">
+    <div class="check" data-key="meal1"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="#15120f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="card-body">
+      <div class="card-title">الوجبة الأولى</div>
+      <div class="pill-row">
+        <span class="pill">4 بياض بيض</span>
+        <span class="pill">1 بيضة كاملة</span>
+        <span class="pill">60 غ شوفان</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-key="meal2">
+    <div class="check" data-key="meal2"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="#15120f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="card-body">
+      <div class="card-title">الوجبة الثانية</div>
+      <div class="pill-row">
+        <span class="pill">5 بياض بيض</span>
+        <span class="pill">150 غ أرز أبيض</span>
+        <span class="pill">سلطة</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-key="meal3">
+    <div class="check" data-key="meal3"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="#15120f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="card-body">
+      <div class="card-title">الوجبة الثالثة</div>
+      <div class="pill-row">
+        <span class="pill">5 بيضات كاملة</span>
+        <span class="pill">200 غ بطاطا</span>
+        <span class="pill">سلطة خضراء</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-key="meal4">
+    <div class="check" data-key="meal4"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="#15120f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="card-body">
+      <div class="card-title">الوجبة الرابعة</div>
+      <div class="pill-row">
+        <span class="pill">5 بياض بيض</span>
+        <span class="pill">حساء خضر</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <span class="tag">قبل التمرين</span>
+    <h2>الوقود السريع</h2>
+  </div>
+  <div class="card" data-key="preworkout">
+    <div class="check" data-key="preworkout"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="#15120f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="card-body">
+      <div class="card-title">قبل التمرين مباشرة</div>
+      <div class="pill-row">
+        <span class="pill">حبتا تمر</span>
+        <span class="pill">كوب قهوة بدون سكر</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <span class="tag">تمرين</span>
+    <h2>البرنامج الأسبوعي</h2>
+  </div>
+  <div class="section-sub">اختر اليوم لعرض تفاصيله</div>
+
+  <div class="day-tabs" id="dayTabs">
+    <div class="day-tab" data-day="0"><span class="num">اليوم</span>الأول</div>
+    <div class="day-tab" data-day="1"><span class="num">اليوم</span>الثاني</div>
+    <div class="day-tab" data-day="2"><span class="num">اليوم</span>الثالث</div>
+    <div class="day-tab" data-day="3"><span class="num">اليوم</span>الرابع</div>
+  </div>
+
+  <div class="day-panel" id="dayPanel">
+    <!-- filled by JS -->
+  </div>
+
+  <button class="reset-btn" id="resetBtn">تصفير قائمة اليوم</button>
+  <div class="foot-note">يُحفظ تقدّمك تلقائيًا على هذا الجهاز</div>
+
+</div>
+
+<script>
+(function(){
+  const DAYS = [
+    { label:"اليوم الأول", title:"صدر + بايسبس وترايسبس", muscles:["الصدر","البايسبس","الترايسبس"], rest:false },
+    { label:"اليوم الثاني", title:"ظهر + أكتاف", muscles:["الظهر","الأكتاف"], rest:false },
+    { label:"اليوم الثالث", title:"أرجل", muscles:["الأرجل"], rest:false },
+    { label:"اليوم الرابع", title:"راحة", muscles:[], rest:true },
+  ];
+
+  const CHECK_KEYS = ["cardio","meal1","meal2","meal3","meal4","preworkout"];
+  const TZ = "Africa/Algiers";
+
+  // "YYYY-MM-DD" الحالي بتوقيت الجزائر
+  function algiersDateStr(){
+    return new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year:"numeric", month:"2-digit", day:"2-digit" }).format(new Date());
+  }
+  function daysBetween(a, b){
+    return Math.round((Date.parse(b) - Date.parse(a)) / 86400000);
+  }
+  function todayKey(){
+    return "daily:" + algiersDateStr();
+  }
+
+  const todayLabel = document.getElementById("todayLabel");
+  const dateFmt = new Intl.DateTimeFormat("ar", { timeZone: TZ, weekday:"long", day:"numeric", month:"long" });
+  function renderDateLabel(){
+    todayLabel.textContent = dateFmt.format(new Date());
+  }
+  renderDateLabel();
+
+  let state = {};
+  let activeDay = 0;
+  let anchor = null;          // { date: "YYYY-MM-DD", day: 0-3 }
+  let currentDailyKey = todayKey();
+
+  // يحسب اليوم النشط انطلاقًا من نقطة الإرساء (anchor) وعدد الأيام المنقضية بتوقيت الجزائر
+  function computeActiveDay(){
+    const diff = daysBetween(anchor.date, algiersDateStr());
+    return ((anchor.day + diff) % 4 + 4) % 4;
+  }
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(currentDailyKey);
+      state = raw ? JSON.parse(raw) : {};
+    }catch(e){ state = {}; }
+
+    try{
+      const raw2 = localStorage.getItem("trainingAnchor");
+      anchor = raw2 ? JSON.parse(raw2) : null;
+    }catch(e){ anchor = null; }
+
+    if(!anchor){
+      // أول استخدام: نبدأ من اليوم الأول اعتبارًا من اليوم الحالي بتوقيت الجزائر
+      anchor = { date: algiersDateStr(), day: 0 };
+      saveAnchor();
+    }
+
+    activeDay = computeActiveDay();
+    render();
+  }
+
+  function saveState(){
+    try{ localStorage.setItem(currentDailyKey, JSON.stringify(state)); }catch(e){}
+  }
+  function saveAnchor(){
+    try{ localStorage.setItem("trainingAnchor", JSON.stringify(anchor)); }catch(e){}
+  }
+
+  // يُنادى كل دقيقة للتحقق من دخول يوم جديد بتوقيت الجزائر (00:00)
+  function checkForNewDay(){
+    const newKey = todayKey();
+    const newActiveDay = computeActiveDay();
+    let changed = false;
+
+    if(newKey !== currentDailyKey){
+      currentDailyKey = newKey;
+      try{
+        const raw = localStorage.getItem(currentDailyKey);
+        state = raw ? JSON.parse(raw) : {};
+      }catch(e){ state = {}; }
+      changed = true;
+    }
+    if(newActiveDay !== activeDay){
+      activeDay = newActiveDay;
+      changed = true;
+    }
+    if(changed){
+      renderDateLabel();
+      render();
+    }
+  }
+  setInterval(checkForNewDay, 60 * 1000);
+
+  function render(){
+    // checklist cards
+    CHECK_KEYS.forEach(key=>{
+      const on = !!state[key];
+      document.querySelectorAll('[data-key="'+key+'"]').forEach(el=>{
+        if(el.classList.contains("card")) el.classList.toggle("done", on);
+        if(el.classList.contains("check")) el.classList.toggle("on", on);
+      });
+    });
+
+    // loader
+    const doneCount = CHECK_KEYS.filter(k=>state[k]).length;
+    document.querySelectorAll(".plate").forEach(p=>{
+      const idx = parseInt(p.dataset.plate,10);
+      p.classList.toggle("on", idx < doneCount);
+    });
+    document.getElementById("countLabel").innerHTML = doneCount + '<span>/6</span>';
+    const caption = document.getElementById("loaderCaption");
+    if(doneCount === 0) caption.textContent = "لم تبدأ بعد — علّم أول عنصر لتحميل القضيب";
+    else if(doneCount === 6) caption.textContent = "القضيب مُحمّل بالكامل — يوم منجز 💪";
+    else caption.textContent = "استمر — تبقّى " + (6-doneCount) + " عناصر";
+
+    // day tabs
+    document.querySelectorAll(".day-tab").forEach(tab=>{
+      tab.classList.toggle("active", parseInt(tab.dataset.day,10) === activeDay);
+    });
+
+    // day panel
+    const d = DAYS[activeDay];
+    const panel = document.getElementById("dayPanel");
+    if(d.rest){
+      panel.innerHTML = `
+        <div class="day-panel-label">${d.label}</div>
+        <div class="day-panel-title">راحة</div>
+        <div class="rest-note">يوم استشفاء — لا تدريب اليوم. نوم جيد وتغذية منتظمة يسرّعان التعافي.</div>
+      `;
+    } else {
+      panel.innerHTML = `
+        <div class="day-panel-label">${d.label}</div>
+        <div class="day-panel-title">${d.title}</div>
+        <div class="muscle-row">
+          ${d.muscles.map(m=>`<span class="muscle-chip">${m}</span>`).join("")}
+        </div>
+      `;
+    }
+  }
+
+  document.querySelectorAll(".check").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const key = el.dataset.key;
+      state[key] = !state[key];
+      render();
+      saveState();
+    });
+  });
+
+  document.querySelectorAll(".day-tab").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      // اختيار يدوي: نعيد ضبط نقطة الإرساء على اليوم الحالي، فيستمر العدّ التلقائي من هنا
+      activeDay = parseInt(el.dataset.day,10);
+      anchor = { date: algiersDateStr(), day: activeDay };
+      render();
+      saveAnchor();
+    });
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", ()=>{
+    state = {};
+    render();
+    saveState();
+  });
+
+  loadState();
+})();
+</script>
+</body>
+</html>
